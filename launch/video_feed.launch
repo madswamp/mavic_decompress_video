@@ -1,0 +1,25 @@
+<launch>
+<arg name="namespace"     default="drone0" />
+<group ns="$(arg namespace)">
+
+	<node name="mavic_decompress_video_node" pkg="mavic_decompress_video" type="mavic_decompress_video_node">
+	</node>
+
+	<node pkg="nodelet" type="nodelet" args="standalone image_proc/rectify" name="camera" 		ns="sensor_measurement" output="screen">
+            <!--remap rectify inputs-->
+            <remap from="image_mono" to="camera/image_raw"/>
+            <remap from="camera_info" to="camera/camera_info"/>
+            <!--remap rectify outputs-->
+            <remap from="image_rect" to="camera/image_rect"/>
+        </node>
+</group>
+
+<group ns="$(arg namespace)/sensor_measurement/camera/image_rect" >
+        <rosparam param="disable_pub_plugins">
+            - 'image_transport/compressedDepth'
+            - 'image_transport/theora'
+            - 'image_transport/compressed'
+            - 'image_proc/crop_decimate'
+        </rosparam>
+    </group>
+</launch>
